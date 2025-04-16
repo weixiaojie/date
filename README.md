@@ -1,3 +1,2 @@
-# date
-# [Anniversary](https://weixiaojie.github.io/date)
+# [some important days](https://weixiaojie.github.io/date)
 
