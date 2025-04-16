@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>纪念日与倒计时</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #ece9e6 0%, #ffffff 100%);
+            font-family: 'Helvetica', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            margin: 1rem;
+        }
+        .title {
+            color: #FF416B;
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .card {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+        .error-card {
+            background: linear-gradient(45deg, #e53e3e, #f56565);
+        }
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.25rem;
+                margin: 0.75rem;
+            }
+            .title {
+                font-size: 1.75rem;
+                margin-bottom: 1.5rem;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .card h3 {
+                font-size: 1.25rem;
+            }
+            .card p {
+                font-size: 1rem;
+            }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .container {
+                padding: 1.75rem;
+                max-width: 700px;
+            }
+            .title {
+                font-size: 2rem;
+            }
+            .card h3 {
+                font-size: 1.375rem;
+            }
+            .card p {
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<!--    <h1 class="title">人生时刻</h1>-->
+    <div id="eventContainer"></div>
+</div>
+
+<script>
+    // Function to add an event (anniversary or countdown)
+    function addEvent(title, text, dateStr, type) {
+        const today = new Date();
+        let eventDate, days, displayText;
+
+        // Handle Gregorian date in format "YYYY-MM-DD"
+        eventDate = new Date(dateStr);
+        if (isNaN(eventDate.getTime())) {
+            console.error(`无效公历日期: ${dateStr}`);
+            const card = document.createElement('div');
+            const eventContainer = document.getElementById('eventContainer');
+            card.className = `card error-card`;
+            card.innerHTML = `
+                    <h3>${title}</h3>
+                    <p>公历日期 ${dateStr} 无效，请检查</p>
+                `;
+            eventContainer.appendChild(card);
+            return;
+        }
+
+        // Calculate days based on type
+        if (type === 'anniversary') {
+            days = Math.floor((today - eventDate) / (1000 * 60 * 60 * 24));
+            displayText = `${text}${days}天`;
+        } else if (type === 'countdown') {
+            if (title.includes('生日')) {
+                // Birthday: Calculate days to next occurrence (within 365 days)
+                let nextEvent = new Date(today.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                if (nextEvent < today) {
+                    nextEvent.setFullYear(today.getFullYear() + 1);
+                }
+                days = Math.ceil((nextEvent - today) / (1000 * 60 * 60 * 24));
+            } else {
+                // Other countdowns (e.g., retirement): Direct difference, can exceed 365 days
+                days = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+            }
+            displayText = `${text}${days}天`;
+        } else {
+            console.error(`无效类型: ${type}`);
+            return; // Invalid type
+        }
+
+        // Create card element
+        const card = document.createElement('div');
+        card.className = `card`;
+        card.innerHTML = `
+                <h3>${title}</h3>
+                <p>${displayText}</p>
+            `;
+
+        // Append to container
+        document.getElementById('eventContainer').appendChild(card);
+    }
+
+    // Add events (easily extensible by adding more calls)
+    addEvent('大可爱', '出生已经 ', '1991-11-21', 'anniversary');
+    addEvent('小可爱', '出生已经 ', '1995-07-19', 'anniversary');
+    addEvent('捷爸生日', '还有 ', '1968-04-02', 'countdown');
+    addEvent('捷妈生日', '还有 ', '1968-04-09', 'countdown');
+    addEvent('大可爱生日', '还有 ', '1991-11-21', 'countdown');
+    addEvent('小可爱生日', '还有 ', '1995-07-19', 'countdown');
+    addEvent('距离退休', '还有 ', '2070-12-31', 'countdown');
+
+    // Example: Add new events
+    // addEvent('朋友生日', '距离朋友生日还有 ', '2025-11-15', 'countdown');
+    // addEvent('爷爷生日', '距离爷爷生日还有 ', '2025-05-10', 'countdown');
+</script>
+</body>
+</html>
